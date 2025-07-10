@@ -108,6 +108,13 @@ class UIManager {
   static closeModal() {
     elements.gameModal.close();
   }
+
+  static resetKeyboard() {
+    const keys = document.querySelectorAll(".key");
+    keys.forEach((key) => {
+      key.className = "key";
+    });
+  }
 }
 
 // INPUT VALIDATION
@@ -258,6 +265,7 @@ function restartGame() {
 
   UIManager.closeModal();
   UIManager.resetBoard();
+  UIManager.resetKeyboard();
   UIManager.showFeedback("New game started!", "success");
 }
 
