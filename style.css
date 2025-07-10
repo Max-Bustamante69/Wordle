@@ -319,10 +319,21 @@ main {
 
 /* Responsive design */
 @media (max-width: 480px) {
-  .char {
+  .char{
     width: 50px;
     height: 50px;
     font-size: 1.5rem;
+  }
+
+  .key{
+    font-size: 15px;
+    width: 32px;
+    height: 32px;
+    
+  }
+
+  .keyboardRow{
+    gap: 0.2rem
   }
   
   .try {
