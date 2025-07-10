@@ -284,7 +284,7 @@ function init() {
     UIManager.createKeyboard();
     UIManager.resetBoard();
     UIManager.showFeedback(
-      "Welcome to Racc Wordle! Start typing cute words for your first guess.",
+      "Welcome to Nigga Wordle! Start typing cute words for your first guess.",
       "info"
     );
     
