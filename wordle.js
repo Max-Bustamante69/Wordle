@@ -1,47 +1,101 @@
+import CONSTANTS from "./constants.js";
 class Wordle {
   constructor(secret) {
-    this._secret = secret;
-    this._secretCount = [...secret].reduce((map, char) => {
-      map[char] = (map[char] || 0) + 1;
-      return map;
-    }, {});
+    this.secret = secret;
+    this.secretSet = new Set(this.secret);
   }
 
   set secret(word) {
-    this._secret = word;
+    if (!word || typeof word !== "string") {
+      throw new Error("Secret word must be a valid string");
+    }
+
+    const cleanWord = word.toLowerCase().trim();
+    if (cleanWord.length !== CONSTANTS.WORD_LENGTH) {
+      throw new Error(
+        `Secret word must be exactly ${CONSTANTS.WORD_LENGTH} characters`
+      );
+    }
+
+    if (!/^[a-z]+$/.test(cleanWord)) {
+      throw new Error("Secret word must contain only letters");
+    }
+
+    this._secret = cleanWord.toUpperCase();
   }
 
   get secret() {
     return this._secret;
   }
 
-  get secretCount() {
-    return this._secretCount;
+  get colors() {
+    return CONSTANTS.COLORS;
+  }
+
+  createCharCount(word) {
+    const count = {};
+    for (const char of word) {
+      count[char] = (count[char] || 0) + 1;
+    }
+    return count;
   }
 
   testWord(word) {
-    return word === this._secret ? "win" : this.colorWord(word);
+    if (!word || typeof word !== "string") return false;
+    return word.trim() === this.secret;
   }
 
   colorWord(word) {
-    const count = structuredClone(this._secretCount);
-    const coloredWord = new Array(5).fill("grey");
+    if (
+      !word ||
+      typeof word !== "string" ||
+      word.length !== CONSTANTS.WORD_LENGTH
+    ) {
+      throw new Error(
+        `Word must be exactly ${CONSTANTS.WORD_LENGTH} characters`
+      );
+    }
 
-    for (let i = 0; i < 5; i++) {
-      if (this._secret[i] === word[i]) {
-        coloredWord[i] = "green";
-        count[word[i]]--;
+    const cleanWord = word.trim();
+    const secretCount = this.createCharCount(this.secret);
+    const result = new Array(CONSTANTS.WORD_LENGTH).fill(CONSTANTS.COLORS.MISS);
+
+    // First pass: mark correct positions
+    for (let i = 0; i < CONSTANTS.WORD_LENGTH; i++) {
+      if (cleanWord[i] === this.secret[i]) {
+        result[i] = CONSTANTS.COLORS.CORRECT;
+        secretCount[cleanWord[i]]--;
       }
     }
 
-    for (let i = 0; i < 5; i++) {
-      if (count[word[i]] && coloredWord[i] === "grey") {
-        coloredWord[i] = "yellow";
-        count[i]--;
+    // Second pass: mark partial matches
+    for (let i = 0; i < CONSTANTS.WORD_LENGTH; i++) {
+      if (
+        result[i] === CONSTANTS.COLORS.MISS &&
+        secretCount[cleanWord[i]] > 0
+      ) {
+        result[i] = CONSTANTS.COLORS.PARTIAL;
+        secretCount[cleanWord[i]]--;
       }
     }
 
-    return coloredWord;
+    return result;
+  }
+
+  getLetterClasses(word) {
+    const colors = this.colorWord(word);
+    return colors.map((color) => {
+      switch (color) {
+        case CONSTANTS.COLORS.CORRECT:
+          return "correct";
+        case CONSTANTS.COLORS.PARTIAL:
+          return "partial";
+        case CONSTANTS.COLORS.MISS:
+          return "incorrect";
+        default:
+          return "incorrect";
+      }
+    });
   }
 }
 
