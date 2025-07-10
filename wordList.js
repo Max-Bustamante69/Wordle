@@ -1,15 +1,10 @@
 const WORD_LIST = [
-  "huron",
-  "alune",
-  "pache",
-  "obama",
-  "tecla",
-  "perro",
-  "fenec",
-  "mouse",
-  "pecas",
-  "kanye",
-  
+'nigga',
+'black',
+'negro',
+'monke',
+'pussy'
+
 ];
 
 
