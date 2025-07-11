@@ -7,10 +7,7 @@ class GameState {
     this.tries = 0;
     this.gameOver = false;
     this.currentRow = 0;
-    this.missedChars = new Set();
   }
-
-
 
   nextTry() {
     this.tries++;
@@ -21,9 +18,7 @@ class GameState {
     return this.gameOver;
   }
 
-  miss(char){
-    this.missedChars.add(char);
-  }
+
 
   endGame() {
     this.gameOver = true;

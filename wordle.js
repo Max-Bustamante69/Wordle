@@ -2,7 +2,6 @@ import CONSTANTS from "./constants.js";
 class Wordle {
   constructor(secret) {
     this.secret = secret;
-    this.secretSet = new Set(this.secret);
   }
 
   set secret(word) {
@@ -22,6 +21,7 @@ class Wordle {
     }
 
     this._secret = cleanWord.toUpperCase();
+    this.secretSet = new Set(this._secret);
   }
 
   get secret() {

@@ -196,16 +196,31 @@ async function handleTry() {
       inputs.forEach((input, i) => {
         const color = colors[i];
         const char = input.value;
-        console.log(game.secretSet);
+        const letterClass = letterClasses[i];
 
-        if (!game.secretSet.has(char) && !gameState.missedChars.has(char)) {
-          gameState.miss(char);
-          const key = document.querySelector(`[data-value="${char}"]`);
-          key.classList.add("incorrect");
+        // Update keyboard based on letter status
+        const key = document.querySelector(`[data-value="${char}"]`);
+        if (key) {
+          if (letterClass === "correct") {
+            key.classList.add("correct");
+          } else if (letterClass === "partial") {
+            // Only add partial if not already correct
+            if (!key.classList.contains("correct")) {
+              key.classList.add("partial");
+            }
+          } else if (letterClass === "incorrect") {
+            // Only add incorrect if not already correct or partial
+            if (
+              !key.classList.contains("correct") &&
+              !key.classList.contains("partial")
+            ) {
+              key.classList.add("incorrect");
+            }
+          }
         }
 
         input.style.backgroundColor = color;
-        input.classList.add(letterClasses[i]);
+        input.classList.add(letterClass);
       });
     }, CONSTANTS.ANIMATION_DELAY * 2);
 
