@@ -1,5 +1,5 @@
 import Wordle from "./wordle.js";
-import CONSTANTS from "./constants.js"
+import CONSTANTS from "./constants.js";
 import WORD_LIST from "./wordList.js";
 import GameState from "./gameState.js";
 import InputValidator from "./inputValidator.js";
@@ -21,32 +21,28 @@ const elements = {
 
 // GAME STATE
 
-
 // GAME INITIALIZATION
 const gameState = new GameState();
 const game = new Wordle(randomWord());
 
 // UI MANAGEMENT
 class UIManager {
-
-  static createKeyboard(){
+  static createKeyboard() {
     const keyboard = elements.keyboard;
-    for(const row of CONSTANTS.QWERTY_ORDER){
-      const rowDiv = document.createElement('div');
-      rowDiv.classList.add('keyboardRow')
-      for(const char of row){
-      
-      const key = document.createElement('div');
+    for (const row of CONSTANTS.QWERTY_ORDER) {
+      const rowDiv = document.createElement("div");
+      rowDiv.classList.add("keyboardRow");
+      for (const char of row) {
+        const key = document.createElement("div");
 
-      key.classList.add('key');
-      key.innerText = char;
-      key.setAttribute('data-value', char)
+        key.classList.add("key");
+        key.innerText = char;
+        key.setAttribute("data-value", char);
 
-      rowDiv.appendChild(key);
+        rowDiv.appendChild(key);
+      }
+      keyboard.appendChild(rowDiv);
     }
-    keyboard.appendChild(rowDiv)
-    }
-
   }
 
   static showFeedback(message, type = "info") {
@@ -119,7 +115,6 @@ class UIManager {
 
 // INPUT VALIDATION
 
-
 // EVENT HANDLERS
 function handleInput(e) {
   if (gameState.isGameOver()) return;
@@ -167,7 +162,7 @@ function handleKeydown(e) {
   // Remove the automatic letter handling - let the input event handle it
 }
 
-function handleTry() {
+async function handleTry() {
   if (gameState.isGameOver()) return;
 
   const inputs = Array.from(elements.tryLines[gameState.currentRow].children);
@@ -182,12 +177,13 @@ function handleTry() {
     return;
   }
 
-  // Optional: Check if word is in word list (uncomment to enable)
-  // if (!InputValidator.isWordInList(word)) {
-  //   UIManager.showFeedback('Not a valid word!', 'error');
-  //   UIManager.animateRow(gameState.currentRow, 'shake');
-  //   return;
-  // }
+  // Check if word is a valid English word using API + local fallback
+  const isValidEnglishWord = await InputValidator.isValidEnglishWord(word);
+  if (!isValidEnglishWord) {
+    UIManager.showFeedback("Not a valid English word!", "error");
+    UIManager.animateRow(gameState.currentRow, "shake");
+    return;
+  }
 
   try {
     const letterClasses = game.getLetterClasses(word);
@@ -200,14 +196,13 @@ function handleTry() {
       inputs.forEach((input, i) => {
         const color = colors[i];
         const char = input.value;
-        console.log(game.secretSet)
+        console.log(game.secretSet);
 
-        if(!game.secretSet.has(char) && !gameState.missedChars.has(char)){
+        if (!game.secretSet.has(char) && !gameState.missedChars.has(char)) {
           gameState.miss(char);
-          const key = document.querySelector(`[data-value="${char}"]`)
-          key.classList.add('incorrect');
-
-        };
+          const key = document.querySelector(`[data-value="${char}"]`);
+          key.classList.add("incorrect");
+        }
 
         input.style.backgroundColor = color;
         input.classList.add(letterClasses[i]);
@@ -292,10 +287,9 @@ function init() {
     UIManager.createKeyboard();
     UIManager.resetBoard();
     UIManager.showFeedback(
-      "Welcome to Nigga Wordle! Start typing cute words for your first guess.",
+      "Welcome to my custom Wordle! Start typing your first 5-letter word guess.",
       "info"
     );
-    
   } catch (error) {
     console.error("Failed to initialize game:", error);
     UIManager.showFeedback(
