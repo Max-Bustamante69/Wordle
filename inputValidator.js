@@ -1,6 +1,7 @@
 import CONSTANTS from "./constants.js";
 import WORD_LIST from "./wordList.js";
 import SPANISH_WORD_LIST from "./wordLists/spanishWords.js";
+import { currentConfig } from "./config.js";
 
 class InputValidator {
   static isValidLetter(char) {
@@ -16,27 +17,50 @@ class InputValidator {
     return wordList.includes(word.toLowerCase());
   }
 
-  // API-based word validation using Free Dictionary API
+  // API-based word validation using proxy server to avoid CORS issues
   static async validateWordWithAPI(word, language = "en") {
     try {
-      const langCode = language === "es" ? "es" : "en";
+      let baseApiUrl;
 
-      const baseApiUrl =
-        language === "es"
-          ? `https://rae-api.com/api/words/`
-          : `https://api.dictionaryapi.dev/api/v2/entries/es/`;
+      let response;
 
-      const response = await fetch(`${baseApiUrl}${word.toLowerCase()}`);
+      if (language === "es") {
+        // Use our proxy server for Spanish words (RAE API)
+        const isDevelopment =
+          window.location.hostname === "localhost" ||
+          window.location.hostname === "127.0.0.1" ||
+          window.location.hostname.includes("localhost");
+
+        if (isDevelopment) {
+          // Local development: append word to URL
+          baseApiUrl = currentConfig.proxyUrl;
+          response = await fetch(`${baseApiUrl}${word.toLowerCase()}`);
+        } else {
+          // Production: use query parameter
+          baseApiUrl = currentConfig.proxyUrl;
+          response = await fetch(`${baseApiUrl}${word.toLowerCase()}`);
+        }
+      } else {
+        // Use direct API for English words (Free Dictionary API)
+        baseApiUrl = currentConfig.englishApiUrl;
+        response = await fetch(`${baseApiUrl}${word.toLowerCase()}`);
+      }
 
       if (response.ok) {
         const data = await response.json();
-        // Check if the word exists and is a valid word in the specified language
-        return (
-          data.length > 0 &&
-          data[0].word &&
-          data[0].meanings &&
-          data[0].meanings.length > 0
-        );
+
+        if (language === "es") {
+          // For Spanish words via proxy, check if data exists
+          return data && data.length > 0;
+        } else {
+          // For English words, check if the word exists and has meanings
+          return (
+            data.length > 0 &&
+            data[0].word &&
+            data[0].meanings &&
+            data[0].meanings.length > 0
+          );
+        }
       }
 
       return false;
