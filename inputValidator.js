@@ -51,7 +51,7 @@ class InputValidator {
 
         if (language === "es") {
           // For Spanish words via proxy, check if data exists
-          return data && data.length > 0;
+          return data && data.ok;
         } else {
           // For English words, check if the word exists and has meanings
           return (
