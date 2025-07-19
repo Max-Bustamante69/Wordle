@@ -23,8 +23,8 @@ class InputValidator {
 
       const baseApiUrl =
         language === "es"
-          ? `https://api.dictionaryapi.dev/api/v2/entries/es/`
-          : `https://rae-api.com/api/words/`;
+          ? `https://rae-api.com/api/words/`
+          : `https://api.dictionaryapi.dev/api/v2/entries/es/`;
 
       const response = await fetch(`${baseApiUrl}${word.toLowerCase()}`);
 
@@ -48,7 +48,7 @@ class InputValidator {
   }
 
   // Combined validation method that tries API first, then falls back to local list
-  static async isValidWordInLanguage(word, language = 'en') {
+  static async isValidWordInLanguage(word, language = "en") {
     // First check if it's a valid format
     if (!this.isValidWord(word)) {
       return false;
