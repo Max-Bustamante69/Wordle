@@ -20,9 +20,13 @@ class InputValidator {
   static async validateWordWithAPI(word, language = "en") {
     try {
       const langCode = language === "es" ? "es" : "en";
-      const response = await fetch(
-        `https://api.dictionaryapi.dev/api/v2/entries/${langCode}/${word.toLowerCase()}`
-      );
+
+      const baseApiUrl =
+        language === "es"
+          ? `https://api.dictionaryapi.dev/api/v2/entries/es/`
+          : `https://rae-api.com/api/words/`;
+
+      const response = await fetch(`${baseApiUrl}${word.toLowerCase()}`);
 
       if (response.ok) {
         const data = await response.json();
