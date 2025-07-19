@@ -1,8 +1,14 @@
 import Wordle from "./wordle.js";
 import CONSTANTS from "./constants.js";
 import WORD_LIST from "./wordList.js";
+import SPANISH_WORD_LIST from "./wordLists/spanishWords.js";
 import GameState from "./gameState.js";
 import InputValidator from "./inputValidator.js";
+import TRANSLATIONS from "./locales/translations.js";
+
+// GAME STATE
+let currentLanguage = "en";
+let currentWordList = WORD_LIST;
 
 //DOM ELEMENTS
 const elements = {
@@ -17,13 +23,46 @@ const elements = {
   closeModalBtn: document.getElementById("closeModalBtn"),
   feedbackMessage: document.getElementById("feedbackMessage"),
   keyboard: document.querySelector("div.keyboard"),
+  languageToggle: document.getElementById("languageToggle"),
+  restartButton: document.getElementById("restartButton"),
+  gameTitle: document.getElementById("gameTitle"),
+  gameSubtitle: document.getElementById("gameSubtitle"),
+  gameInstructions: document.getElementById("gameInstructions"),
 };
 
 // GAME STATE
 
 // GAME INITIALIZATION
 const gameState = new GameState();
-const game = new Wordle(randomWord());
+let game = new Wordle(randomWord());
+
+// LANGUAGE MANAGEMENT
+function updateLanguage(lang) {
+  currentLanguage = lang;
+  currentWordList = lang === "es" ? SPANISH_WORD_LIST : WORD_LIST;
+
+  // Update UI text
+  elements.gameTitle.textContent = TRANSLATIONS[lang].title;
+  elements.gameSubtitle.textContent = TRANSLATIONS[lang].subtitle;
+  elements.gameInstructions.textContent = TRANSLATIONS[lang].instructions;
+  elements.languageToggle.textContent = TRANSLATIONS[lang].languageToggle;
+  elements.restartButton.textContent = TRANSLATIONS[lang].restartButton;
+  elements.restartBtn.textContent = TRANSLATIONS[lang].playAgain;
+  elements.closeModalBtn.textContent = TRANSLATIONS[lang].close;
+
+  // Update modal labels
+  const secretWordLabel = document.querySelector(".stat-label:first-child");
+  const triesUsedLabel = document.querySelector(".stat-label:last-child");
+  if (secretWordLabel)
+    secretWordLabel.textContent = TRANSLATIONS[lang].secretWord;
+  if (triesUsedLabel) triesUsedLabel.textContent = TRANSLATIONS[lang].triesUsed;
+}
+
+function toggleLanguage() {
+  const newLang = currentLanguage === "en" ? "es" : "en";
+  updateLanguage(newLang);
+  restartGame();
+}
 
 // UI MANAGEMENT
 class UIManager {
@@ -125,7 +164,7 @@ function handleInput(e) {
   // Only allow letters
   if (value && !InputValidator.isValidLetter(value)) {
     input.value = "";
-    UIManager.showFeedback("Only letters are allowed!", "error");
+    UIManager.showFeedback(TRANSLATIONS[currentLanguage].onlyLetters, "error");
     return;
   }
 
@@ -172,15 +211,25 @@ async function handleTry() {
     .trim();
 
   if (!InputValidator.isValidWord(word)) {
-    UIManager.showFeedback("Please enter a complete 5-letter word!", "error");
+    UIManager.showFeedback(
+      TRANSLATIONS[currentLanguage].completeWordError,
+      "error"
+    );
     UIManager.animateRow(gameState.currentRow, "shake");
     return;
   }
 
-  // Check if word is a valid English word using API + local fallback
-  const isValidEnglishWord = await InputValidator.isValidEnglishWord(word);
-  if (!isValidEnglishWord) {
-    UIManager.showFeedback("Not a valid English word!", "error");
+  // Check if word is a valid word in the current language using API + local fallback
+  const isValidWord = await InputValidator.isValidWordInLanguage(
+    word,
+    currentLanguage
+  );
+  if (!isValidWord) {
+    const errorMessage =
+      currentLanguage === "es"
+        ? TRANSLATIONS[currentLanguage].notValidSpanishWord
+        : TRANSLATIONS[currentLanguage].notValidWord;
+    UIManager.showFeedback(errorMessage, "error");
     UIManager.animateRow(gameState.currentRow, "shake");
     return;
   }
@@ -242,7 +291,10 @@ async function handleTry() {
       handleNextTurn();
     }
   } catch (error) {
-    UIManager.showFeedback("An error occurred. Please try again.", "error");
+    UIManager.showFeedback(
+      TRANSLATIONS[currentLanguage].errorOccurred,
+      "error"
+    );
     console.error(error);
   }
 }
@@ -261,22 +313,31 @@ function handleNextTurn() {
 }
 
 function handleWin() {
-  UIManager.showModal("🎉 Congratulations!", "You guessed the word correctly!");
+  UIManager.showModal(
+    TRANSLATIONS[currentLanguage].congratulations,
+    TRANSLATIONS[currentLanguage].congratulationsMessage
+  );
 }
 
 function handleLoss() {
-  UIManager.showModal("😞 Game Over", "Better luck next time!");
+  UIManager.showModal(
+    TRANSLATIONS[currentLanguage].gameOver,
+    TRANSLATIONS[currentLanguage].gameOverMessage
+  );
 }
 
 function restartGame() {
   gameState.reset();
   const newWord = randomWord();
-  game.secret = newWord;
+  game = new Wordle(newWord);
 
   UIManager.closeModal();
   UIManager.resetBoard();
   UIManager.resetKeyboard();
-  UIManager.showFeedback("New game started!", "success");
+  UIManager.showFeedback(
+    TRANSLATIONS[currentLanguage].newGameStarted,
+    "success"
+  );
 }
 
 // EVENT LISTENERS
@@ -288,11 +349,13 @@ function addEventListeners() {
 
   elements.restartBtn.addEventListener("click", restartGame);
   elements.closeModalBtn.addEventListener("click", UIManager.closeModal);
+  elements.languageToggle.addEventListener("click", toggleLanguage);
+  elements.restartButton.addEventListener("click", restartGame);
 }
 
 // UTILITY FUNCTIONS
 function randomWord() {
-  return WORD_LIST[Math.floor(Math.random() * WORD_LIST.length)];
+  return currentWordList[Math.floor(Math.random() * currentWordList.length)];
 }
 
 // INITIALIZATION
@@ -302,13 +365,13 @@ function init() {
     UIManager.createKeyboard();
     UIManager.resetBoard();
     UIManager.showFeedback(
-      "Welcome to my custom Wordle! Start typing your first 5-letter word guess.",
+      TRANSLATIONS[currentLanguage].welcomeMessage,
       "info"
     );
   } catch (error) {
     console.error("Failed to initialize game:", error);
     UIManager.showFeedback(
-      "Failed to start game. Please refresh the page.",
+      TRANSLATIONS[currentLanguage].failedToStart,
       "error"
     );
   }

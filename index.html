@@ -11,8 +11,12 @@
 
 <body>
     <header>
-        <h1>Welcome to Max Wordle</h1>
-        <h2>Try to guess the 5-letter word</h2>
+        <div class="header-controls">
+            <button id="languageToggle" class="btn btn-secondary">Español</button>
+            <button id="restartButton" class="btn btn-primary">Restart</button>
+        </div>
+        <h1 id="gameTitle">Welcome to Max Wordle</h1>
+        <h2 id="gameSubtitle">Try to guess the 5-letter word</h2>
     </header>
 
     <main>
@@ -98,7 +102,7 @@
 
         <!-- Game Instructions -->
         <div class="instructions">
-            <p>Enter a 5-letter word and press Enter to guess!</p>
+            <p id="gameInstructions">Enter a 5-letter word and press Enter to guess!</p>
         </div>
 
         <div class="keyboard"></div>

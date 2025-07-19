@@ -1,0 +1,53 @@
+const TRANSLATIONS = {
+  en: {
+    title: "Welcome to Max Wordle",
+    subtitle: "Try to guess the 5-letter word",
+    instructions: "Enter a 5-letter word and press Enter to guess!",
+    languageToggle: "Español",
+    restartButton: "Restart",
+    playAgain: "Play Again",
+    close: "Close",
+    congratulations: "🎉 Congratulations!",
+    congratulationsMessage: "You guessed the word correctly!",
+    gameOver: "😞 Game Over",
+    gameOverMessage: "Better luck next time!",
+    secretWord: "Secret Word:",
+    triesUsed: "Tries Used:",
+    welcomeMessage:
+      "Welcome to my custom Wordle! Start typing your first 5-letter word guess.",
+    completeWordError: "Please enter a complete 5-letter word!",
+    notValidWord: "Not a valid English word!",
+    onlyLetters: "Only letters are allowed!",
+    newGameStarted: "New game started!",
+    failedToStart: "Failed to start game. Please refresh the page.",
+    errorOccurred: "An error occurred. Please try again.",
+    notValidSpanishWord: "Not a valid Spanish word!",
+  },
+  es: {
+    title: "Bienvenido a Max Wordle",
+    subtitle: "Intenta adivinar la palabra de 5 letras",
+    instructions:
+      "¡Ingresa una palabra de 5 letras y presiona Enter para adivinar!",
+    languageToggle: "English",
+    restartButton: "Reiniciar",
+    playAgain: "Jugar de Nuevo",
+    close: "Cerrar",
+    congratulations: "🎉 ¡Felicitaciones!",
+    congratulationsMessage: "¡Adivinaste la palabra correctamente!",
+    gameOver: "😞 Fin del Juego",
+    gameOverMessage: "¡Mejor suerte la próxima vez!",
+    secretWord: "Palabra Secreta:",
+    triesUsed: "Intentos Usados:",
+    welcomeMessage:
+      "¡Bienvenido a mi Wordle personalizado! Comienza escribiendo tu primera palabra de 5 letras.",
+    completeWordError: "¡Por favor ingresa una palabra completa de 5 letras!",
+    notValidWord: "¡No es una palabra válida en inglés!",
+    onlyLetters: "¡Solo se permiten letras!",
+    newGameStarted: "¡Nuevo juego iniciado!",
+    failedToStart: "Error al iniciar el juego. Por favor recarga la página.",
+    errorOccurred: "Ocurrió un error. Por favor intenta de nuevo.",
+    notValidSpanishWord: "¡No es una palabra válida en español!",
+  },
+};
+
+export default TRANSLATIONS;
